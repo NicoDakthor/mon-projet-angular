@@ -42,5 +42,5 @@ export class AppComponent implements OnInit {
     } else {
       return null;
     }
-}
+  }
 }
