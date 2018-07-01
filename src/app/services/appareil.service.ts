@@ -1,5 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Subject } from 'rxjs';
+import { HttpClient } from '@angular/common/http';
+
 
 @Injectable({
   providedIn: 'root'
@@ -9,22 +11,24 @@ export class AppareilService {
   appareilSubject = new Subject<any[]>();
 
   private appareils = [
-    {
-      id: 1,
-      name: 'Machine à laver',
-      status: 'éteint'
-    },
-    {
-      id: 2,
-      name: 'Frigo',
-      status: 'allumé'
-    },
-    {
-      id: 3,
-      name: 'Ordinateur',
-      status: 'éteint'
-    }
+  //  {
+  //    id: 1,
+  //    name: 'Machine à laver',
+  //    status: 'éteint'
+  //  },
+  //  {
+  //    id: 2,
+  //    name: 'Frigo',
+  //    status: 'allumé'
+  //  },
+  //  {
+  //    id: 3,
+  //    name: 'Ordinateur',
+  //    status: 'éteint'
+  //  }
   ];
+
+  constructor(private httpClient: HttpClient) {}
 
   emitAppareilSubject() {
     this.appareilSubject.next(this.appareils.slice());
@@ -63,7 +67,7 @@ export class AppareilService {
     this.emitAppareilSubject();
   }
 
-  addAppareil(name: string, status: string){
+  addAppareil(name: string, status: string) {
     const appareilObject = {
       id: 0,
       name: '',
@@ -75,5 +79,33 @@ export class AppareilService {
 
     this.appareils.push(appareilObject);
     this.emitAppareilSubject();
+  }
+
+  saveAppareilsToServer() {
+    this.httpClient
+    .put('https://http-client-demo-331ab.firebaseio.com/appareils.json', this.appareils)
+    .subscribe(
+      () => {
+        console.log('Enregistrement terminé');
+      },
+      (error) => {
+        console.log('Erreur de sauvegarde ' + error);
+      }
+    );
+  }
+
+  getAppareilsFromServer() {
+    this.httpClient
+    .get<any[]>('https://http-client-demo-331ab.firebaseio.com/appareils.json')
+    .subscribe(
+      (response) => {
+        console.log('get Appareils terminé');
+        this.appareils = response;
+        this.emitAppareilSubject();
+      },
+      (error) => {
+        console.log('Erreur de get Appareils ' + error);
+      }
+    );
   }
 }
